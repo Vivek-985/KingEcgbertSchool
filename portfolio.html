@@ -182,11 +182,69 @@
         </form>
     </div>
 
+    <style>
+      /* Popup message styling */
+      #popupMessage {
+        display: none;
+        position: fixed;
+        top: 20%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: #f4a261;
+        color: #2f3e4e;
+        padding: 20px 30px;
+        border-radius: 12px;
+        box-shadow: 0 5px 15px rgba(244, 162, 97, 0.7);
+        font-weight: 900;
+        font-size: 1.2rem;
+        z-index: 1000;
+        text-align: center;
+        max-width: 80%;
+        animation: fadeInOut 3s forwards;
+      }
+
+      @keyframes fadeInOut {
+        0% {
+          opacity: 0;
+          transform: translate(-50%, -60%);
+        }
+        10%, 90% {
+          opacity: 1;
+          transform: translate(-50%, -50%);
+        }
+        100% {
+          opacity: 0;
+          transform: translate(-50%, -40%);
+        }
+      }
+    </style>
+
+    <div id="popupMessage">Thank you for your comment!</div>
+
     <script>
         // Function to go back to the previous page
         function goBack() {
             window.history.back();
         }
+
+        // Handle comment form submission
+        const commentForm = document.getElementById('commentForm');
+        const popupMessage = document.getElementById('popupMessage');
+
+        commentForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            // Show popup message
+            popupMessage.style.display = 'block';
+
+            // Hide popup after animation duration (3s)
+            setTimeout(() => {
+                popupMessage.style.display = 'none';
+            }, 3000);
+
+            // Optionally clear the form fields
+            commentForm.reset();
+        });
     </script>
 </body>
 </html>
