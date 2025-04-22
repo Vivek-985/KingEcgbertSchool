@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'Arial Black', Gadget, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #2f3e4e;
+            color: #ffffff;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #3b4f63;
+            border-radius: 8px;
+            box-shadow: 0 5px 12px rgba(244, 162, 97, 0.4);
+            color: #ffffff;
+        }
+
+        .chart-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .chart-column {
+            flex: 1;
+            padding: 10px;
+            background-color: #2f3e4e;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(244, 162, 97, 0.6);
+            margin-right: 20px;
+            color: #ffffff;
+        }
+
+        canvas {
+            max-width: 100%;
+            height: auto;
+            margin: 0 auto;
+            display: block;
+        }
+
+        h2 {
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: #f4a261;
+        }
+
+        .back-button {
+            margin-top: 0px;
+            text-align: center;
+            height: 20px;
+            width: 20px;
+        }
+
+        .colorful-button {
+            background-color: #f4a261;
+            margin-bottom: 20px;
+            color: #ffffff;
+            border-color: #d18e3a;
+            border-radius: 8px;
+            padding: 6px 12px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 3px 8px rgba(244, 162, 97, 0.7);
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .colorful-button:hover {
+            background-color: #d18e3a;
+            color: #ffffff;
+        }
+
+        /* Table Styling */
+        table {
+            width: 80%;
+            margin: 20px auto;
+            border-collapse: collapse;
+            background-color: #2f3e4e;
+            border: 1px solid #f4a261;
+            box-shadow: 0 3px 10px rgba(244, 162, 97, 0.6);
+            color: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th, td {
+            border: 1px solid #f4a261;
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f4a261;
+            font-weight: bold;
+            color: #ffffff;
+        }
+
+        tr:nth-child(even) {
+            background-color: #3b4f63;
+        }
+
+        tr:hover {
+            background-color: #f4a261;
+            color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+    <div class="back-button">
+        <button class="colorful-button" onclick="goBack()"><i class="fas fa-arrow-left"></i> Back</button>
+    </div>
+    <div class="container">
+        <!-- Table moved inside container -->
+        <table>
+            <tr>
+                <th>Phase</th>
+                <th>Duration</th>
+                <th>Estimated Start</th>
+                <th>Estimated End</th>
+            </tr>
+            <tr>
+                <td>1. Site Preparation</td>
+                <td>2 months</td>
+                <td>Month 1</td>
+                <td>Month 2</td>
+            </tr>
+            <tr>
+                <td>2. Foundation and Structural Work</td>
+                <td>4 months</td>
+                <td>Month 3</td>
+                <td>Month 6</td>
+            </tr>
+            <tr>
+                <td>3. Interior Fit-Out and Finishing</td>
+                <td>6 months</td>
+                <td>Month 7</td>
+                <td>Month 12</td>
+            </tr>
+            <tr>
+                <td>4. Final Inspections and Handover</td>
+                <td>2 months</td>
+                <td>Month 13</td>
+                <td>Month 14</td>
+            </tr>
+        </table>
+        <div class="chart-row">
+            <div class="chart-column">
+                <h2>Site Works Summary</h2>
+                <canvas id="barChart1" width="400" height="200"></canvas>
+            </div>
+            <div class="chart-column">
+                <h2>Project Preliminaries and Contingencies</h2>
+                <canvas id="barChart2" width="400" height="200"></canvas>
+            </div>
+        </div>
+        <div class="chart-row">
+            <div class="chart-column">
+                <h2>Structural Components Distribution</h2>
+                <canvas id="pieChart1" width="350" height="350"></canvas>
+            </div>
+            <div class="chart-column">
+                <h2>Finishing Materials Breakdown</h2>
+                <canvas id="pieChart2" width="350" height="350"></canvas>
+            </div>
+            <div class="chart-column">
+                <h2>Fittings and Installations Overview</h2>
+                <canvas id="pieChart3" width="350" height="350"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data for the pie charts
+        const pieLabels1 = ['Frame Elements', 'Upper Floors', 'Roof Structure', 'Staircases', 'External Walls', 'Windows and Doors', 'Internal Walls', 'Internal Doors'];
+        const pieValues1 = [6413,91913,105450,32063,84075,57000,101888,14250];
+       
+        const pieLabels2 = ['Wall Finishes', 'Floor Finishes', 'Ceiling Finishes'];
+        const pieValues2 = [101888,60563,22088];
+     
+        const pieLabels3 = ['Fittings & Furnishings', 'Sanitary Appliances', 'Services Equipment', 'Disposal Installations', 'Water Installations', 'Heat Source', 'Heating & Air Conditioning', 'Ventilating Systems', 'Electrical Installations', 'Fuel Installations', 'Lift & Conveyor Installations', 'Fire & Lightning Protection', 'Communications & Security', 'Special Installations', 'Builders Work', 'Commissioning Management'];
+        const pieValues3 = [39188,19950, 0, 0, 0, 0,186675, 85500,46313, 0, 0, 0, 0, 0,42750, 0];
+                
+        // Data for the bar charts
+        const barLabels1 = ['Site Works', 'Drainage', 'External Services', 'Minor Building Works', 'Demolition & External Work'];
+        const barValues1 = [114000,44175,84075, 8550,16388];
+      
+        const barLabels2 = ['Preliminaries', 'Contingencies'];
+        const barValues2 = [10, 35625];
+
+        // Creating pie charts
+        new Chart(document.getElementById('pieChart1'), {
+            type: 'pie',
+            data: {
+                labels: pieLabels1,
+                datasets: [{
+                    data: pieValues1,
+                    backgroundColor: ['#f4a261', '#6a8caf', '#3b4f63', '#2f3e4e', '#f4a261', '#6a8caf', '#3b4f63', '#2f3e4e']
+                }]
+            },
+            options: {
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'right',
+                        align: 'start',
+                        labels: {
+                            boxWidth: 20,
+                            color: '#ffffff'
+                        }
+                    },
+                    datalabels: {
+                        color: '#ffffff',
+                        font: {
+                            weight: 'bold'
+                        }
+                    }
+                }
+            }
+        });
+        new Chart(document.getElementById('pieChart2'), {
+            type: 'pie',
+            data: {
+                labels: pieLabels2,
+                datasets: [{
+                    data: pieValues2,
+                    backgroundColor: ['#f4a261', '#6a8caf', '#3b4f63']
+                }]
+            },
+            options: {
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'right',
+                        align: 'start',
+                        labels: {
+                            boxWidth: 20,
+                            color: '#ffffff'
+                        }
+                    },
+                    datalabels: {
+                        color: '#ffffff',
+                        font: {
+                            weight: 'bold'
+                        }
+                    }
+                }
+            }
+        });
+        new Chart(document.getElementById('pieChart3'), {
+            type: 'pie',
+            data: {
+                labels: pieLabels3,
+                datasets: [{
+                    data: pieValues3,
+                    backgroundColor: ['#f4a261', '#6a8caf', '#3b4f63', '#2f3e4e', '#f4a261', '#6a8caf', '#3b4f63', '#2f3e4e', '#f4a261', '#6a8caf', '#3b4f63', '#2f3e4e', '#f4a261', '#6a8caf', '#3b4f63', '#2f3e4e']
+                }]
+            },
+            options: {
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'right',
+                        align: 'start',
+                        labels: {
+                            boxWidth: 20,
+                            color: '#ffffff'
+                        }
+                    },
+                    datalabels: {
+                        color: '#ffffff',
+                        font: {
+                            weight: 'bold'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Creating bar charts
+        new Chart(document.getElementById('barChart1'), {
+            type: 'bar',
+            data: {
+                labels: barLabels1,
+                datasets: [{
+                    label: 'Quantity',
+                    data: barValues1,
+                    backgroundColor: '#f4a261'
+                }]
+            },
+            options: {
+                plugins: {
+                    legend: {
+                        display: false,
+                        labels: {
+                            color: '#ffffff'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                color: '#ffffff'
+                            },
+                            grid: {
+                                color: '#ffffff'
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                color: '#ffffff'
+                            },
+                            grid: {
+                                color: '#ffffff'
+                            }
+                        }
+                    },
+                    datalabels: {
+                        color: '#ffffff'
+                    }
+                }
+            }
+        });
+        new Chart(document.getElementById('barChart2'), {
+            type: 'bar',
+            data: {
+                labels: barLabels2,
+                datasets: [{
+                    label: 'Quantity',
+                    data: barValues2,
+                    backgroundColor: '#6a8caf'
+                }]
+            },
+            options: {
+                plugins: {
+                    legend: {
+                        display: false,
+                        labels: {
+                            color: '#ffffff'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                color: '#ffffff'
+                            },
+                            grid: {
+                                color: '#ffffff'
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                color: '#ffffff'
+                            },
+                            grid: {
+                                color: '#ffffff'
+                            }
+                        }
+                    },
+                    datalabels: {
+                        color: '#ffffff'
+                    }
+                }
+            }
+        });
+
+        // Function to go back to the previous page
+        function goBack() {
+            window.history.back();
+        }
+    </script>
+</body>
+</html>
